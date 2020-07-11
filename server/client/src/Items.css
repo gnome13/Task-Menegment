@@ -1,0 +1,25 @@
+.divimg{
+    display: inline-block;
+    width: 15%;
+    height: 120px;
+}
+
+.divDesc{
+    display: inline-block;
+    width: 55%;
+    height: 120px;
+}
+.divPrice{
+    display: inline-block;
+    width: 16%;
+    height: 120px;
+}
+
+.divItems{
+    height: 155px;
+    border: 2px solid rgb(197, 197, 252);
+    border-radius: 25px;
+    margin-bottom: 15px;
+    margin-right: 45px;
+    margin-left: 45px;
+}

@@ -1,0 +1,43 @@
+.aling{
+    text-align: right;
+}
+.tab1{
+    width: 91%;
+    display: inline-block;
+}
+.tableBorder{
+    border: 1px solid rgb(217, 236, 252);
+}
+.fontWeigth{
+    font-weight: bold;
+}
+.fontColor{
+    color: green;
+}
+.tab2{
+    width: 4%;
+    display: inline-block;
+}
+.tab3{
+    width: 15%;
+    float: left;
+    background-color: green;
+    color:white;
+}
+.tab4{
+    width: 82%;
+}
+.iconstyle{
+    position: absolute;
+    left: 60px; 
+    top: 150px;   
+}
+.focusCurcor{
+    text-decoration: none;
+    cursor: none;
+}
+.rigthText{
+    /* float: right;  */
+    font-weight: normal;   
+    font-size: 90%;
+}

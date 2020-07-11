@@ -1,0 +1,45 @@
+.orderImg{
+    display: inline-block;
+    width: 15%;
+    height: 120px;
+    
+}
+.orderLeft{
+    display: inline-block;
+    width: 6%;
+    height: 120px;
+}
+.OrderDesc{
+    display: inline-block;
+    width: 49%;
+    height: 120px;
+}
+
+.OrderPrice{
+    display: inline-block;
+    width: 16%;
+    height: 120px;
+}
+.OrderQuality{
+    display: inline-block;
+    width: 8%;
+    height: 120px;
+    
+    color:rgb(35, 35, 167);
+}
+.OrdeRight{
+    display: inline-block;
+    width: 5%;
+    height: 120px;
+}
+.OrderItems{
+   
+
+    height: 155px;
+    border: 2px solid rgb(197, 197, 252);
+    border-radius: 25px;
+    margin-bottom: 15px;
+    margin-right: 45px;
+    margin-left: 45px;
+    
+}
