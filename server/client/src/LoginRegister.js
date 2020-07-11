@@ -31,7 +31,6 @@ class LoginRegister extends Component {
         axios.post('/users/register',{email:this.state.email,password:this.state.password
         }).then(res => {
             if(res.status===201){
-                this.setState({redirecttoDetails:true})
                 this.props.history.push(`/Tasks/${res.data.userID}/${res.data.boss}`);
             }
             else{

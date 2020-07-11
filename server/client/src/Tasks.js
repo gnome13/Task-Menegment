@@ -17,7 +17,7 @@ class Tasks extends Component {
     componentDidMount() {
         setInterval(() => {
             getTasks(this.getTasksCallback);
-        }, 10000)
+        }, 100000)
     }
     getTasksCallback = (data) => {
         if (data.tasks !== null) {
@@ -86,13 +86,67 @@ class Tasks extends Component {
             currentMonth=(currentdate.getMonth() + 1);
         }        
         return currentDay + "." + currentMonth + "." + currentdate.getFullYear();
-    }      
+    } 
+    deleteTask= (taskID,userID) =>{
+        this.setState({isError:false});
+        if((Number(this.props.userID)===Number(userID) || this.props.boss==='true')){        
+            axios.delete(`/tasks/${taskID}`)
+            .then(res => {
+
+            }).catch(err => {
+                console.log(err);
+                this.setState({isError:true});
+            });  
+        }            
+    } 
+    addtask = () =>{
+        console.log('add');
+        this.setState({isError:false});
+        axios.post('/tasks',{userID:1,clientName:'fffff',telefon:'324555',email:'kuku@com',creationDate:('2020-07-09T21:00:00.000+00:00'),description:'jjjjjjjjjjj'
+        }).then(res => {
+            if(res.status===201){
+                
+            }
+            else{
+                this.setState({isError:true});
+                console.log(`error code : &{res.status}`);
+            }
+        }).catch(err => {
+            console.log(err);
+            this.setState({isError:true});
+        });
+    }  
+
+    updateTask = (index) =>{
+        this.setState({isError:false});
+        if((Number(this.props.userID)===Number(this.state.tasks[index].userID) || this.props.boss==='true')){
+            axios.put('/tasks',{taskID:this.state.tasks[index].taskID,
+                userID:this.state.tasks[index].userID,
+                clientName:this.state.tasks[index].clientName,
+                telefon:this.state.tasks[index].telefon,
+                email:this.state.tasks[index].email,
+                description:this.state.tasks[index].description
+            }).then(res => {
+                if(res.status===200){
+    
+                }
+                else{
+                    this.setState({isError:true});
+                    console.log(`error code : &{res.status}`);
+                }
+            }).catch(err => {
+                console.log(err);
+                this.setState({isError:true});
+            });             
+        }
+ 
+    }            
     render() {
          
         const tasks = this.state.taskPage.map((task,index) => (
             <tr key={index} className='focusCurcor'>
-            <td  style={{ cursor: 'pointer' }}><FaRegTrashAlt /> &ensp; &ensp; <FaRegEdit />  &ensp; &ensp;<FaRegEye /> </td>
-            {(Number(this.props.userID)===Number(task.userID) || this.props.boss===true) ? 
+            <td  style={{ cursor: 'pointer' }}><FaRegTrashAlt onClick={() => this.deleteTask(task.taskID,task.userID)}/> &ensp; &ensp; <FaRegEdit onClick={() => this.updateTask(index)}/>  &ensp; &ensp;<FaRegEye /> </td>
+            {(Number(this.props.userID)===Number(task.userID) || this.props.boss==='true') ? 
                     <td>{this.DateFormat(task.creationDate) }&ensp; &ensp; <MdCheck /> </td> : 
                     <td>{this.DateFormat(task.creationDate) }&ensp;&ensp;&ensp;&ensp;&ensp;</td>}
                 <td>{task.email}</td>
@@ -100,7 +154,7 @@ class Tasks extends Component {
             <td>{task.clientName} <input type="checkbox"  /></td>
             </tr> 
         ))          
- 
+        
         return (
             <div >  
                 <br></br>
@@ -112,7 +166,7 @@ class Tasks extends Component {
                 <br></br>
                 <br></br> 
                 <br></br> 
-                <div className='aling tab1 fontWeigth'><button className='fontWeigth tab3'>משימה חדשה</button><span className='fontWeigth tab4'>{this.state.tasksSum}</span></div><div className="tab2"></div>
+                <div className='aling tab1 fontWeigth'><button className='fontWeigth tab3' onClick={this.addtask}>משימה חדשה</button><span className='fontWeigth tab4'>{this.state.tasksSum}</span></div><div className="tab2"></div>
                 <br></br>
                 <br></br>
                                            

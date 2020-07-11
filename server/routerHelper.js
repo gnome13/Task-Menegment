@@ -1,8 +1,35 @@
 const MongoClient = require('mongodb').MongoClient;
 const url = "mongodb://localhost:27017/";
 const dbName='TaskManagement', collectionName='users'
-var idsUsers = 3,taskID=24;
+var idsUsers = 3,idsTasks=24;
 
+function handeDelete(req,res,param){
+  MongoClient.connect(url, function(err, db) {
+      if (err)  {
+          res.sendStatus(500);
+          return;
+      }
+      const dbo = db.db(dbName);
+      dbo.collection('tasks').find(param).toArray(function(err, result) {
+          if (err)  {
+              res.sendStatus(500);
+              return;
+          }
+          if (result.length==0){
+              res.sendStatus(404);
+          }
+          else {
+              dbo.collection('tasks').deleteOne(param, function(err, result) {
+                  if (err)  {
+                      res.sendStatus(500);
+                      return;
+                  }
+                  res.sendStatus(200);
+                  });     
+          }
+      });
+  });
+}
 
 function handeGet(req,res){
   MongoClient.connect(url,{useUnifiedTopology: true,useNewUrlParser: true,}, function(err, db) {
@@ -65,9 +92,7 @@ function register(req,res){
           //--email found 
           return res.sendStatus(400);
         }
-        
         //no match insert user
-        // dbo.collection(collectionName).insertOne(queryUser, function(err, result) {
         dbo.collection(collectionName).insertOne({email:queryUser.email,password:queryUser.password,userID:idsUsers}, function(err, result) {
           if (err) {
             console.log(err);
@@ -76,268 +101,52 @@ function register(req,res){
           idsUsers++;
           return res.status(201).send({email:queryUser.email,password:queryUser.password,userID:idsUsers-1});
         });      
-       
-        
       });
     });
 }
-// function addOrder(req,res,collectionNameParam){
-//   console.log("/users/order is accessed");
-//   MongoClient.connect(url, function(err, db) {
-//     if (err) {
-//       console.log(err);
-//       return res.sendStatus(500);
-//     };
-//     const dbo = db.db(dbName);
-//     const queryUser=req.body;
-//     let now = new Date();
-//     let tarich=now.getDate() + '/' + (now.getMonth()+1) + '/' + now.getFullYear();
-//     dbo.collection(collectionNameParam).insertOne({orderID:idOrders,userID:queryUser.userID,itemID:queryUser.itemID,quantity:Number(queryUser.quantity),date:tarich,status:1}, function(err, result) {
-//       if (err) {
-//         console.log(err);
-//         return res.sendStatus(500);
-//       };
-//       idOrders++;
-     
-//       return res.status(201).send({orderID:idOrders-1,userID:queryUser.userID,itemID:queryUser.itemID,quantity:Number(queryUser.quantity)});
-//     });      
-//   });
-// }
 
-// function addshoppingCard(req,res,collectionNameParam){
-//   console.log("collectionNameParam is accessed");
-//   MongoClient.connect(url, function(err, db) {
-//     if (err) {
-//       console.log(err);
-//       return res.sendStatus(500);
-//     };
-//     const dbo = db.db(dbName);
-//     const queryUser=req.body;
-//     dbo.collection(collectionNameParam).insertOne({userID:queryUser.userID,itemID:queryUser.itemID,quantity:Number(queryUser.quantity)}, function(err, result) {
-//       if (err) {
-//         console.log(err);
-//         return res.sendStatus(500);
-//       };
-//     const queryUser=req.body;
-//     return res.status(201).send({userID:queryUser.userID,itemID:queryUser.itemID,quantity:Number(queryUser.quantity)});
-//     });      
-//   });
-// }
-
-// function userAdress(req,res){
-//   console.log("/users/userAdress  is accessed");
-//   MongoClient.connect(url, function(err, db) {
-//     if (err) {
-//       console.log(err);
-//       return res.sendStatus(500);
-//     };
-//     const dbo = db.db(dbName);
-//     const queryUser=req.body;
-//     dbo.collection(collectionNameAdr).findOne({userID:queryUser.userID}, function(err, userfound) {
-//       if (err) {
-//         console.log(err);
-//         return res.sendStatus(500);
-//       };
-//       if(userfound) {
-//         //--user found 
-//         return res.sendStatus(400);
-//       }
-      
-//       //no match insert user
-//       dbo.collection(collectionNameAdr).insertOne(queryUser, function(err, result) {
-//         if (err) {
-//           console.log(err);
-//           return res.sendStatus(500);
-//         };
-//         res.sendStatus(201);
-//       });      
-     
-      
-//     });
-//   });
-// }
-function userUpdate(req,res,CollectionNameUpdate){
-  console.log("/users is accessed ",CollectionNameUpdate);
+function taskUpdate(req,res){
+  console.log("/items is accessed");
   MongoClient.connect(url, {useUnifiedTopology: true,useNewUrlParser: true,},function(err, db) {
     if (err) {
       console.log(err);
       return res.sendStatus(500);
     };
     const dbo = db.db(dbName);
-    //espesting email, password
-    const queryUser=req.body;
-    dbo.collection(CollectionNameUpdate).findOne({userID:queryUser.userID},function(err, userfound) {
-      if (err) {
-        console.log(err);
-        return res.sendStatus(500);
-      };
-      if(userfound) {
-        
-        dbo.collection(CollectionNameUpdate).deleteOne({userID:queryUser.userID}, function(err, result) {
-          if (err)  {
-              res.sendStatus(500);
-              return;
-          }
-          //no match insert user
-          dbo.collection(CollectionNameUpdate).insertOne(queryUser, function(err, result) {
-            if (err) {
-              console.log(err);
-              return res.sendStatus(500);
-            };
-            return res.status(200).send(queryUser)
-          });           
-          // res.sendStatus(200);
-          // db.close();
-          });    
-      }
-      else{
-        dbo.collection(CollectionNameUpdate).insertOne(queryUser, function(err, result) {
-          if (err) {
-            console.log(err);
-            return res.sendStatus(500);
-          };
-          return res.status(200).send(queryUser)
-        });          
-      }
+    const query=req.body;
+    var myquery = { askID:query.taskID };
+    var newvalues = { $set: {userID:Number(query.userID),clientName:query.clientName,telefon:query.telefon,email:(query.email),description:query.description} };
+    dbo.collection("tasks").updateOne(myquery, newvalues, function(err, res) {
+      if (err) throw err;
+      console.log("1 document updated");
+    // ? db.close();
     });
   });
 }
 
-// function categoriotAdd(req,res,CollectionNameadd){
-//   console.log("/categoriot  is accessed");
-//   MongoClient.connect(url, function(err, db) {
-//     if (err) {
-//       console.log(err);
-//       return res.sendStatus(500);
-//     };
-//     const dbo = db.db(dbName);
-//     const query=req.body;
-//     dbo.collection(CollectionNameadd).findOne({description:query.description}, function(err, userfound) {
-//       if (err) {
-//         console.log(err);
-//         return res.sendStatus(500);
-//       };
-//       if(userfound) {
-//         //--user found 
-//         return res.sendStatus(400);
-//       }
-      
-//       //no match insert user
-//       dbo.collection(CollectionNameadd).insertOne({categoriot:idCategoriot,description:query.description}, function(err, result) {
-//         if (err) {
-//           console.log(err);
-//           return res.sendStatus(500);
-//         };
-//         idCategoriot++;
-//         return res.status(201).send({categoriot:idCategoriot,description:query.description});
-//       });      
-//     });
-//   });
-// }
-// function categoriotUpdate(req,res,CollectionNameUpdate){
-//   console.log("/categoriot is accessed");
-//   MongoClient.connect(url, {useUnifiedTopology: true,useNewUrlParser: true,},function(err, db) {
-//     if (err) {
-//       console.log(err);
-//       return res.sendStatus(500);
-//     };
-//     const dbo = db.db(dbName);
-//     //espesting email, password
-//     const query=req.body;
-//     console.log(query);
-//     dbo.collection(CollectionNameUpdate).findOne({categoriot:query.categoriot},function(err, categoryfound) {
-//       if (err) {
-//         console.log(err);
-//         return res.sendStatus(500);
-//       };
-//       if(categoryfound) {
-        
-//         dbo.collection(CollectionNameUpdate).deleteOne({categoriot:query.categoriot}, function(err, result) {
-//           if (err)  {
-//               res.sendStatus(500);
-//               return;
-//           }
-//           //no match insert user
-//           dbo.collection(CollectionNameUpdate).insertOne(query, function(err, result) {
-//             if (err) {
-//               console.log(err);
-//               return res.sendStatus(500);
-//             };
-//             return res.status(200).send(query)
-//           });           
-//           // res.sendStatus(200);
-//           // db.close();
-//           });    
-//       }
-//     });
-//   });
-// }
-// function itemsUpdate(req,res,CollectionNameUpdate){
-//   console.log("/items is accessed");
-//   MongoClient.connect(url, {useUnifiedTopology: true,useNewUrlParser: true,},function(err, db) {
-//     if (err) {
-//       console.log(err);
-//       return res.sendStatus(500);
-//     };
-//     const dbo = db.db(dbName);
-//     //espesting email, password
-//     const query=req.body;
-//     dbo.collection(CollectionNameUpdate).findOne({itemID:query.itemID,categoriotID:query.categoriotID},function(err, itemfound) {
-//       if (err) {
-//         console.log(err);
-//         return res.sendStatus(500);
-//       };
-//       if(itemfound) {
-        
-//         dbo.collection(CollectionNameUpdate).deleteOne({itemID:query.itemID,categoriotID:query.categoriotID}, function(err, result) {
-//           if (err)  {
-//               res.sendStatus(500);
-//               return;
-//           }
-//           //no match insert user
-//           dbo.collection(CollectionNameUpdate).insertOne(query, function(err, result) {
-//             if (err) {
-//               console.log(err);
-//               return res.sendStatus(500);
-//             };
-//             return res.status(200).send(query)
-//           });           
-//           // res.sendStatus(200);
-//           // db.close();
-//           });    
-//       }
-//     });
-//   });
-// }
-// function itemsAdd(req,res,CollectionNameadd){
-//   console.log("/items  is accessed");
-//   MongoClient.connect(url, function(err, db) {
-//     if (err) {
-//       console.log(err);
-//       return res.sendStatus(500);
-//     };
-//     const dbo = db.db(dbName);
-//     const query=req.body;
-//     //no match insert user
-//     dbo.collection(CollectionNameadd).insertOne({itemID:idsItems,categoriotID:query.categoriotID,description:query.description,picture:query.picture,price:Number(query.price)}, function(err, result) {
-//       if (err) {
-//         console.log(err);
-//         return res.sendStatus(500);
-//       };
-//       idsItems++;
-//       return res.status(201).send({itemID:idsItems,categoriotID:query.categoriotID,description:query.description,picture:query.picture,price:Number(query.price)});
-//     });      
-//   });
-// }
+ function taskAdd(req,res){
+  console.log("/tasks  is accessed");
+  MongoClient.connect(url, {useUnifiedTopology: true,useNewUrlParser: true,},function(err, db) {
+    if (err) {
+      console.log(err);
+      return res.sendStatus(500);
+    };
+    const dbo = db.db(dbName);
+    const query=req.body;
+    //no match insert 
+    dbo.collection('tasks').insertOne({taskID:idsTasks,userID:Number(query.userID),clientName:query.clientName,telefon:query.telefon,email:(query.email),creationDate:new Date(),description:query.description}, function(err, result) {
+      if (err) {
+        console.log(err);
+        return res.sendStatus(500);
+      };
+      idsTasks++;
+      return res.status(201).send({taskID:idsTasks,userID:Number(query.userID),clientName:query.clientName,telefon:query.telefon,email:(query.email),creationDate:query.creationDate,description:query.description});
+    });      
+  });
+}
 module.exports.register = register;
 module.exports.login = login;
-// module.exports.userAdress = userAdress;
-module.exports.userUpdate = userUpdate;
 module.exports.handeGet = handeGet;
-
-// module.exports.addOrder = addOrder;
-// module.exports.addshoppingCard = addshoppingCard;
-// module.exports.categoriotUpdate = categoriotUpdate;
-// module.exports.categoriotAdd = categoriotAdd;
-// module.exports.itemsUpdate = itemsUpdate;
-// module.exports.itemsAdd = itemsAdd;
+module.exports.handeDelete = handeDelete;
+module.exports.taskAdd = taskAdd;
+module.exports.taskUpdate = taskUpdate;
