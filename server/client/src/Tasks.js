@@ -8,7 +8,7 @@ import { MdSearch,MdCheck  } from 'react-icons/md';
 import { FaRegEdit, FaRegEye,FaRegTrashAlt,FaArrowsAltV} from "react-icons/fa";
 
 class Tasks extends Component {
-    state={tasks:[],tasksSum:0,isError:false,sortOrderDate:true,sortOrdername:true,rigthText:'', pageNumberOfLines:20,pagecurrentPage:1};
+    state={tasks:[],taskPage:[],tasksSum:0,isError:false,sortOrderDate:true,sortOrdername:true,rigthText:'', pageNumberOfLines:20,pagecurrentPage:1};
 
     constructor(props) {
         super(props);
@@ -64,6 +64,13 @@ class Tasks extends Component {
         currentLinesEnd=Number(this.state.pageNumberOfLines)*Number(this.state.pagecurrentPage);
         currentLinesBegin=currentLinesEnd-Number(this.state.pageNumberOfLines) + 1 ;
         this.setState({ rigthText: ('מראה ' + currentLinesBegin + ' - ' + currentLinesEnd + ' מתוך ' + this.state.tasks.length + ' תוצאות ') });
+        let tasksnew=[];
+        for (let index = 0; index < this.state.tasks.length; index++) {
+            if (index >=currentLinesBegin-1 && index<= currentLinesEnd-1){
+                tasksnew[index]=this.state.tasks[index];
+            }
+        }
+        this.setState({ taskPage: tasksnew });
     }                   
     DateFormat = (createDate) =>{
         const currentdate = new Date(createDate);
@@ -82,7 +89,7 @@ class Tasks extends Component {
     }      
     render() {
          
-        const tasks = this.state.tasks.map((task,index) => (
+        const tasks = this.state.taskPage.map((task,index) => (
             <tr key={index} className='focusCurcor'>
             <td  style={{ cursor: 'pointer' }}><FaRegTrashAlt /> &ensp; &ensp; <FaRegEdit />  &ensp; &ensp;<FaRegEye /> </td>
             {(Number(this.props.userID)===Number(task.userID) || this.props.boss===true) ? 

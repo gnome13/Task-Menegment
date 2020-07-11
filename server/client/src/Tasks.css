@@ -34,10 +34,9 @@
 }
 .focusCurcor{
     text-decoration: none;
-    cursor: none;
+    cursor: pointer;
 }
 .rigthText{
-    /* float: right;  */
     font-weight: normal;   
     font-size: 90%;
 }
